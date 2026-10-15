@@ -1,0 +1,80 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+}
+
+group 'com.gaofeiyang'
+version '1.0'
+
+configurations {
+    compileOnly { //仅在编译时依赖，此处为lombok使用，相关注解在编译时生成getter、setter等
+        extendsFrom annotationProcessor
+    }
+
+    // 剔除所有log4j的引入，在后续依赖中引入log4j2
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    all*.exclude group: 'log4j'
+
+    // SpringBoot缺省使用logback做为Log引擎，剔除引入logback。
+    all*.exclude group: 'ch.qos.logback'
+
+    // spring-boot-starter-logging是依赖logback的实现，剔除，并在后续依赖中引入org.springframework.boot:spring-boot-starter-log4j2
+    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
+repositories {
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    mavenCentral()
+}
+
+dependencies {
+    // 对config目录的依赖要放到testRuntime中，否则SpringBoot打包时会把config目录下测试用的配置文件也打包到发布jar中。
+    testRuntime files('config')
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.6'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2:2.5.6'
+
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.2'
+
+    implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.6'
+    implementation group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    implementation group: 'com.squareup.okio', name: 'okio', version: '2.6.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
+}
+
+springBoot {
+    mainClassName = 'com.gaofeiyang.wms.WMSApplication'
+}
+
+build {
+    doLast {
+        def distDir = file("$buildDir/distributions")
+        distDir.mkdirs()
+
+        def configDir = file("$buildDir/config")
+        configDir.mkdirs()
+
+        copy {
+            from "config"
+            into "${configDir}"
+            exclude "**/log4j2.xml"
+            exclude "**/application.yml"
+            rename { String fileName ->
+                fileName.replace('.release.', '.')
+            }
+        }
+    }
+}

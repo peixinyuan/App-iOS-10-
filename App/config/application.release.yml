@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+logging:
+  config: ${app.home}/config/log4j2.xml
+  level:
+    org.springframework: WARN
+
+spring:
+  jackson:
+    serialization:
+      indent_output: true

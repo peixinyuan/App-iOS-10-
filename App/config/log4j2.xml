@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg %n"/>
+        </Console>
+
+        <RollingFile name="LOGFILE" fileName="${sys:app.home:-.}/logs/wms.log"
+                     filePattern="${sys:app.home:-.}/logs/wms_%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg %n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="false" interval="1" />
+                <SizeBasedTriggeringPolicy size="1024 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="LOGFILE" />
+        </Root>
+    </Loggers>
+</Configuration>

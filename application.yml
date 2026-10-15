@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://123.56.223.77:3306/wms?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: G@o2020213588
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  hikari:
+    maximum-pool-size: 30
+    minimum-idle: 2
+    connection-timeout: 60000
+    idle-timeout: 60000
+    max-lifetime: 600000
+    login-timeout: 5
+  jackson:
+    serialization:
+      indent_output: true
+
+logging:
+  config: config/log4j2.xml
+  level:
+    org.springframework: WARN
